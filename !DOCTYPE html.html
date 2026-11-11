@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSTEM CRITICAL ERROR</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+        }
+        /* Ekran startowy z czerwonym przyciskiem */
+        #start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #111;
+            z-index: 20;
+            cursor: pointer;
+        }
+        #start-screen img {
+            max-width: 300px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        #start-screen img:hover {
+            transform: scale(1.05);
+        }
+        #start-screen p {
+            color: white;
+            font-family: sans-serif;
+            font-size: 22px;
+            margin-top: 20px;
+        }
+
+        /* Właściwy ekran wirusa (ukryty na start) */
+        #virus-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            background-color: #000;
+        }
+        #bg-image {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ekran z czerwonym przyciskiem -->
+    <div id="start-screen" onclick="triggerPrank()">
+        <!-- Plik graficzny czerwonego przycisku -->
+        <img src="redbutton.png" alt="Czerwony Przycisk" onerror="alert('Błąd: Brak pliku redbutton.png w folderze!');">
+        <p>Kliknij tu żeby przejsc dalej</p>
+    </div>
+
+    <!-- Ekran wirusa (pokazuje się po kliknięciu) -->
+    <div id="virus-screen">
+        <img id="bg-image" src="fakewirus.png" alt="Fake Virus Screen" onerror="alert('Błąd: Brak pliku fakewirus.png w folderze!');">
+    </div>
+
+    <!-- Dźwięk alarmu -->
+    <audio id="alarm-sound" loop preload="auto">
+        <source src="fakewirussound.mp3" type="audio/mpeg">
+        Twoja przeglądarka nie obsługuje audio.
+    </audio>
+
+    <script>
+        const sound = document.getElementById('alarm-sound');
+        const startScreen = document.getElementById('start-screen');
+        const virusScreen = document.getElementById('virus-screen');
+
+        function triggerPrank() {
+            // 1. Uruchomienie dźwięku
+            sound.play().catch(err => {
+                console.log("Audio zablokowane:", err);
+            });
+
+            // 2. Zamiana ekranu startowego na ekran wirusa
+            startScreen.style.display = 'none';
+            virusScreen.style.display = 'block';
+
+            // 3. Przejście w tryb pełnoekranowy
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) {
+                document.documentElement.msRequestFullscreen();
+            }
+        }
+    </script>
+</body>
+</html>
