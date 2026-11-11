@@ -16,6 +16,7 @@
             overflow: hidden;
             background-color: #000;
         }
+        
         /* Ekran startowy z czerwonym przyciskiem */
         #start-screen {
             position: absolute;
@@ -55,34 +56,35 @@
             height: 100%;
             display: none;
             background-color: #000;
+            pointer-events: none; /* Blokuje interakcję myszką znajomego */
         }
         #bg-image {
-            width: 100vw;
-            height: 100vw;
             width: 100vw;
             height: 100vh;
             object-fit: cover;
             display: block;
         }
 
-        /* Fałszywa myszka, która sama się porusza */
+        /* Samoruchomy kursor myszy */
         #fake-cursor {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 20px;
-            height: 20px;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="red" stroke="black" stroke-width="1"><polygon points="5.5,3 5.5,21 10.5,16 16,21 18,19 12.5,14 19,14"/></svg>');
+            top: 50%;
+            left: 50%;
+            width: 28px;
+            height: 28px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="red" stroke="white" stroke-width="1.5"><polygon points="5.5,3 5.5,21 10.5,16 16,21 18,19 12.5,14 19,14"/></svg>');
             background-size: contain;
-            pointer-events: none;
-            z-index: 9999;
+            background-repeat: no-repeat;
+            z-index: 99999;
             display: none;
+            pointer-events: none;
+            transition: top 0.08s ease-out, left 0.08s ease-out; /* Płynny ruch */
         }
     </style>
 </head>
 <body>
 
-    <!-- Ekran z czerwonym przyciskiem -->
+    <!-- Ekran startowy z czerwonym przyciskiem -->
     <div id="start-screen" onclick="triggerPrank()">
         <img src="redbutton.png" alt="Czerwony Przycisk" onerror="alert('Błąd: Brak pliku redbutton.png w folderze!');">
         <p>Kliknij tu żeby przejsc dalej</p>
@@ -93,7 +95,7 @@
         <img id="bg-image" src="fakewirus.png" alt="Fake Virus Screen" onerror="alert('Błąd: Brak pliku fakewirus.png w folderze!');">
     </div>
 
-    <!-- Fałszywy kursor myszy -->
+    <!-- Samoruchoma czerwona strzałka myszy -->
     <div id="fake-cursor"></div>
 
     <!-- Dźwięk alarmu -->
@@ -114,13 +116,13 @@
                 console.log("Audio zablokowane:", err);
             });
 
-            // 2. Zamiana ekranu startowego na ekran wirusa
+            // 2. Pokazanie ekranu wirusa i włączenie fałszywego kursora
             startScreen.style.display = 'none';
             virusScreen.style.display = 'block';
             fakeCursor.style.display = 'block';
 
-            // 3. Uruchomienie samoruchomego kursora
-            startFakeCursor();
+            // 3. Uruchomienie szalejącego kursora
+            startCrazyCursor();
 
             // 4. Przejście w tryb pełnoekranowy
             if (document.documentElement.requestFullscreen) {
@@ -132,22 +134,15 @@
             }
         }
 
-        function startFakeCursor() {
-            let posX = window.innerWidth / 2;
-            let posY = window.innerHeight / 2;
-            
+        function startCrazyCursor() {
             setInterval(() => {
-                // Losowy ruch o kilkadziesiąt pikseli w losowym kierunku
-                posX += (Math.random() - 0.5) * 300;
-                posY += (Math.random() - 0.5) * 300;
+                // Losowa pozycja na ekranie
+                const randomX = Math.random() * (window.innerWidth - 50);
+                const randomY = Math.random() * (window.innerHeight - 50);
 
-                // Ograniczenie do granic ekranu
-                posX = Math.max(50, Math.min(window.innerWidth - 50, posX));
-                posY = Math.max(50, Math.min(window.innerHeight - 50, posY));
-
-                fakeCursor.style.left = posX + 'px';
-                fakeCursor.style.top = posY + 'px';
-            }, 150); // Skacze w nowe miejsce co 0.15 sekundy
+                fakeCursor.style.left = randomX + 'px';
+                fakeCursor.style.top = randomY + 'px';
+            }, 100); // Kursor zmienia pozycję co 0.1 sekundy, płynnie sunąc po ekranie
         }
     </script>
 </body>
