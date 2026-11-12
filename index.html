@@ -83,7 +83,7 @@
             filter: drop-shadow(0px 0px 15px red);
         }
 
-        /* Okno z paskiem postępu usuwania danych */
+        /* Okno z paskiem postępu i zegarem śmierci */
         #progress-container {
             position: fixed;
             top: 50%;
@@ -99,22 +99,29 @@
             color: white;
             box-shadow: 0 0 30px rgba(255, 0, 0, 0.7);
             pointer-events: none;
-            width: 450px;
+            width: 480px;
         }
         #progress-container h2 {
             color: red;
-            margin-bottom: 15px;
-            font-size: 22px;
+            margin-bottom: 10px;
+            font-size: 20px;
             text-transform: uppercase;
+        }
+        #countdown-timer {
+            font-size: 28px;
+            color: #ff3333;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px red;
         }
         #progress-bar-bg {
             width: 100%;
             background: #333;
-            height: 25px;
+            height: 22px;
             border-radius: 4px;
             overflow: hidden;
             border: 1px solid #555;
-            margin-top: 15px;
+            margin-top: 10px;
         }
         #progress-bar-fill {
             width: 0%;
@@ -123,9 +130,40 @@
             transition: width 0.2s linear;
         }
         #progress-text {
-            margin-top: 10px;
-            font-size: 14px;
+            margin-top: 8px;
+            font-size: 13px;
             color: #ffcccc;
+        }
+
+        /* Symulacja nagrywania z kamery (REC) */
+        #webcam-sim {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid red;
+            padding: 10px 15px;
+            border-radius: 5px;
+            color: white;
+            z-index: 100;
+            display: none;
+            font-size: 14px;
+            align-items: center;
+            gap: 10px;
+            pointer-events: none;
+        }
+        #rec-dot {
+            width: 12px;
+            height: 12px;
+            background-color: red;
+            border-radius: 50%;
+            box-shadow: 0 0 8px red;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.2; }
+            100% { opacity: 1; }
         }
 
         /* Fałszywy, szalejący kursor myszy */
@@ -162,9 +200,16 @@
         <img src="fakevirushacked.png" alt="Hacked Box" onerror="alert('Błąd: Brak pliku fakevirushacked.png w folderze!');">
     </div>
 
-    <!-- Pasek postępu usuwania danych -->
+    <!-- Symulacja nagrywania kamerki -->
+    <div id="webcam-sim">
+        <div id="rec-dot"></div>
+        <span>REC [KAMERA 1: AKTYWNA]</span>
+    </div>
+
+    <!-- Pasek postępu i zegar śmierci -->
     <div id="progress-container">
         <h2>⚠️ KRYTYCZNY BŁĄD SYSTEMU ⚠️</h2>
+        <div id="countdown-timer">Zablokowanie dysku za: 00:45</div>
         <div id="progress-status">Usuwanie danych konta i plików systemowych...</div>
         <div id="progress-bar-bg">
             <div id="progress-bar-fill"></div>
@@ -187,9 +232,11 @@
         const virusScreen = document.getElementById('virus-screen');
         const floatingBox = document.getElementById('floating-box');
         const progressContainer = document.getElementById('progress-container');
+        const webcamSim = document.getElementById('webcam-sim');
         const progressBarFill = document.getElementById('progress-bar-fill');
         const progressText = document.getElementById('progress-text');
         const progressStatus = document.getElementById('progress-status');
+        const countdownTimer = document.getElementById('countdown-timer');
         const fakeCursor = document.getElementById('fake-cursor');
 
         // Fizyka latającego okienka
@@ -208,13 +255,15 @@
             virusScreen.style.display = 'block';
             floatingBox.style.display = 'block';
             progressContainer.style.display = 'block';
+            webcamSim.style.display = 'flex';
             fakeCursor.style.display = 'block';
             document.body.style.cursor = 'none';
 
-            // 3. Uruchomienie animacji, kursora i paska postępu
+            // 3. Uruchomienie animacji, zegara i funkcji paniki
             requestAnimationFrame(animateDVD);
             startCrazyCursor();
             startProgressBar();
+            startCountdown();
             startErrorSpam();
 
             // 4. Wymuszenie pełnego ekranu
@@ -248,6 +297,21 @@
             requestAnimationFrame(animateDVD);
         }
 
+        // Tykający zegar śmierci
+        function startCountdown() {
+            let timeLeft = 45; // 45 sekund
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                let seconds = timeLeft < 10 ? '0' + timeLeft : timeLeft;
+                countdownTimer.innerText = `Zablokowanie dysku za: 00:${seconds}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    countdownTimer.innerText = "⚠️ DYSK ZOSTALI ZABLOKOWANY! ⚠️";
+                }
+            }, 1000);
+        }
+
         // Symulacja paska postępu usuwania danych
         function startProgressBar() {
             let progress = 0;
@@ -269,7 +333,7 @@
                         progressStatus.innerText = 'Kopiowanie danych na zewnętrzny serwer...';
                     }
                 }
-            }, 300);
+            }, 400);
         }
 
         // Lawina wyskakujących okienek z błędami (alertów)
@@ -285,7 +349,7 @@
             setInterval(() => {
                 const randomMsg = errorMessages[Math.floor(Math.random() * errorMessages.length)];
                 alert(randomMsg);
-            }, 3500);
+            }, 4000);
         }
 
         // Szalejący fałszywy kursor myszy
