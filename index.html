@@ -48,7 +48,7 @@
             margin-top: 20px;
         }
 
-        /* Właściwy ekran wirusa w tle */
+        /* Właściwy ekran wirusa w tle z efektem pijanego ekranu (falowanie) */
         #virus-screen {
             position: absolute;
             top: 0;
@@ -59,7 +59,29 @@
             background-color: #000;
             cursor: none !important; 
             z-index: 1;
+            animation: drunkWave 4s ease-in-out infinite alternate;
         }
+
+        /* Animacja pijanego ekranu (falowanie i lekkie kołysanie) */
+        @keyframes drunkWave {
+            0% {
+                transform: scale(1.05) rotate(0deg) skew(0deg, 0deg);
+                filter: hue-rotate(0deg);
+            }
+            33% {
+                transform: scale(1.1) rotate(2deg) skew(3deg, 1deg);
+                filter: hue-rotate(40deg);
+            }
+            66% {
+                transform: scale(1.05) rotate(-2deg) skew(-3deg, -1deg);
+                filter: hue-rotate(-40deg);
+            }
+            100% {
+                transform: scale(1.1) rotate(1deg) skew(1deg, -2deg);
+                filter: hue-rotate(20deg);
+            }
+        }
+
         #bg-image {
             width: 100vw;
             height: 100vh;
@@ -299,7 +321,7 @@
 
         // Tykający zegar śmierci
         function startCountdown() {
-            let timeLeft = 45; // 45 sekund
+            let timeLeft = 45;
             const timerInterval = setInterval(() => {
                 timeLeft--;
                 let seconds = timeLeft < 10 ? '0' + timeLeft : timeLeft;
@@ -307,7 +329,7 @@
                 
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    countdownTimer.innerText = "⚠️ DYSK ZOSTALI ZABLOKOWANY! ⚠️";
+                    countdownTimer.innerText = "⚠️ DYSK ZOSTAŁ ZABLOKOWANY! ⚠️";
                 }
             }, 1000);
         }
