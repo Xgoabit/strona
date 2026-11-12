@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM CRITICAL ERROR</title>
+    <title>Strona internetowa</title>
     <style>
         * {
             margin: 0;
@@ -15,6 +15,7 @@
             height: 100%;
             overflow: hidden;
             background-color: #000;
+            font-family: 'Courier New', Courier, monospace;
         }
         
         /* Ekran startowy z czerwonym przyciskiem */
@@ -65,12 +66,13 @@
             object-fit: cover;
             display: block;
             pointer-events: none;
+            cursor: none !important;
         }
 
-        /* Latające okienko HACKED */
+        /* Latające okienko HACKED (fakevirushacked.png) */
         #floating-box {
             position: fixed;
-            width: 250px; /* Rozmiar latającego okienka */
+            width: 280px; 
             z-index: 10;
             display: none;
             pointer-events: none;
@@ -78,10 +80,55 @@
         #floating-box img {
             width: 100%;
             display: block;
-            filter: drop-shadow(0px 0px 10px red);
+            filter: drop-shadow(0px 0px 15px red);
         }
 
-        /* Samoruchomy kursor myszy */
+        /* Okno z paskiem postępu usuwania danych */
+        #progress-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(20, 0, 0, 0.95);
+            border: 2px solid red;
+            padding: 30px;
+            border-radius: 8px;
+            z-index: 100;
+            display: none;
+            text-align: center;
+            color: white;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.7);
+            pointer-events: none;
+            width: 450px;
+        }
+        #progress-container h2 {
+            color: red;
+            margin-bottom: 15px;
+            font-size: 22px;
+            text-transform: uppercase;
+        }
+        #progress-bar-bg {
+            width: 100%;
+            background: #333;
+            height: 25px;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #555;
+            margin-top: 15px;
+        }
+        #progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: red;
+            transition: width 0.2s linear;
+        }
+        #progress-text {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #ffcccc;
+        }
+
+        /* Fałszywy, szalejący kursor myszy */
         #fake-cursor {
             position: fixed;
             top: 50%;
@@ -97,7 +144,7 @@
         }
     </style>
 </head>
-<body>
+<body style="cursor: none !important;">
 
     <!-- Ekran startowy z czerwonym przyciskiem -->
     <div id="start-screen" onclick="triggerPrank()">
@@ -115,6 +162,16 @@
         <img src="fakevirushacked.png" alt="Hacked Box" onerror="alert('Błąd: Brak pliku fakevirushacked.png w folderze!');">
     </div>
 
+    <!-- Pasek postępu usuwania danych -->
+    <div id="progress-container">
+        <h2>⚠️ KRYTYCZNY BŁĄD SYSTEMU ⚠️</h2>
+        <div id="progress-status">Usuwanie danych konta i plików systemowych...</div>
+        <div id="progress-bar-bg">
+            <div id="progress-bar-fill"></div>
+        </div>
+        <div id="progress-text">Postęp: 0%</div>
+    </div>
+
     <!-- Samoruchoma czerwona strzałka myszy -->
     <div id="fake-cursor"></div>
 
@@ -129,12 +186,16 @@
         const startScreen = document.getElementById('start-screen');
         const virusScreen = document.getElementById('virus-screen');
         const floatingBox = document.getElementById('floating-box');
+        const progressContainer = document.getElementById('progress-container');
+        const progressBarFill = document.getElementById('progress-bar-fill');
+        const progressText = document.getElementById('progress-text');
+        const progressStatus = document.getElementById('progress-status');
         const fakeCursor = document.getElementById('fake-cursor');
 
-        // Zmienne do fizyki latającego okienka
-        let posX = 100, posY = 100;
-        let speedX = 4;
-        let speedY = 4;
+        // Fizyka latającego okienka
+        let posX = 150, posY = 150;
+        let speedX = 5;
+        let speedY = 5;
 
         function triggerPrank() {
             // 1. Uruchomienie dźwięku
@@ -142,17 +203,21 @@
                 console.log("Audio zablokowane:", err);
             });
 
-            // 2. Pokazanie ekranu wirusa, latającego okienka i kursora
+            // 2. Pokazanie elementów żartu
             startScreen.style.display = 'none';
             virusScreen.style.display = 'block';
             floatingBox.style.display = 'block';
+            progressContainer.style.display = 'block';
             fakeCursor.style.display = 'block';
+            document.body.style.cursor = 'none';
 
-            // 3. Uruchomienie animacji latającego okienka i kursora
+            // 3. Uruchomienie animacji, kursora i paska postępu
             requestAnimationFrame(animateDVD);
             startCrazyCursor();
+            startProgressBar();
+            startErrorSpam();
 
-            // 4. Pełny ekran
+            // 4. Wymuszenie pełnego ekranu
             if (document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen();
             } else if (document.documentElement.webkitRequestFullscreen) {
@@ -162,15 +227,14 @@
             }
         }
 
-        // Funkcja sprawiająca, że okienko "HACKED" odbija się od krawędzi
+        // Odbijanie się okienka HACKED od ścian
         function animateDVD() {
             posX += speedX;
             posY += speedY;
 
-            const boxWidth = floatingBox.clientWidth;
-            const boxHeight = floatingBox.clientHeight;
+            const boxWidth = floatingBox.clientWidth || 280;
+            const boxHeight = floatingBox.clientHeight || 150;
 
-            // Odbicia od ścian
             if (posX <= 0 || posX + boxWidth >= window.innerWidth) {
                 speedX = -speedX;
             }
@@ -184,14 +248,54 @@
             requestAnimationFrame(animateDVD);
         }
 
-        // Funkcja szalejącego kursora myszy
+        // Symulacja paska postępu usuwania danych
+        function startProgressBar() {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 3) + 1;
+                if (progress >= 100) {
+                    progress = 100;
+                    progressBarFill.style.width = '100%';
+                    progressText.innerText = 'Postęp: 100%';
+                    progressStatus.innerText = '⚠️ DANE ZOSTAŁY USUNIĘTE! ⚠️';
+                    clearInterval(interval);
+                } else {
+                    progressBarFill.style.width = progress + '%';
+                    progressText.innerText = 'Postęp: ' + progress + '%';
+                    
+                    if (progress > 70) {
+                        progressStatus.innerText = 'Usuwanie haseł i plików sesji...';
+                    } else if (progress > 40) {
+                        progressStatus.innerText = 'Kopiowanie danych na zewnętrzny serwer...';
+                    }
+                }
+            }, 300);
+        }
+
+        // Lawina wyskakujących okienek z błędami (alertów)
+        function startErrorSpam() {
+            const errorMessages = [
+                "Błąd krytyczny: Utracono połączenie z systemem plików!",
+                "Uwaga! Wykryto nieznanego wirusa trojan.exe",
+                "Ostrzeżenie: Próba kradzieży danych logowania!",
+                "Karta graficzna przestała odpowiadać i zresetowała się.",
+                "Błąd pamięci RAM: Odczyt niemożliwy (0x00000FF)"
+            ];
+
+            setInterval(() => {
+                const randomMsg = errorMessages[Math.floor(Math.random() * errorMessages.length)];
+                alert(randomMsg);
+            }, 3500);
+        }
+
+        // Szalejący fałszywy kursor myszy
         function startCrazyCursor() {
             setInterval(() => {
-                const randomX = Math.random() * (window.innerWidth - 50);
-                const randomY = Math.random() * (window.innerHeight - 50);
+                const randomX = Math.random() * (window.innerWidth - 60);
+                const randomY = Math.random() * (window.innerHeight - 60);
                 fakeCursor.style.left = randomX + 'px';
                 fakeCursor.style.top = randomY + 'px';
-            }, 80);
+            }, 70);
         }
 
         // Blokada klawiszy
