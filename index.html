@@ -47,7 +47,7 @@
             margin-top: 20px;
         }
 
-        /* Właściwy ekran wirusa (ukryty na start) */
+        /* Właściwy ekran wirusa w tle */
         #virus-screen {
             position: absolute;
             top: 0;
@@ -56,13 +56,29 @@
             height: 100%;
             display: none;
             background-color: #000;
-            pointer-events: none; /* Blokuje interakcję myszką znajomego */
+            cursor: none !important; 
+            z-index: 1;
         }
         #bg-image {
             width: 100vw;
             height: 100vh;
             object-fit: cover;
             display: block;
+            pointer-events: none;
+        }
+
+        /* Latające okienko HACKED */
+        #floating-box {
+            position: fixed;
+            width: 250px; /* Rozmiar latającego okienka */
+            z-index: 10;
+            display: none;
+            pointer-events: none;
+        }
+        #floating-box img {
+            width: 100%;
+            display: block;
+            filter: drop-shadow(0px 0px 10px red);
         }
 
         /* Samoruchomy kursor myszy */
@@ -70,15 +86,14 @@
             position: fixed;
             top: 50%;
             left: 50%;
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="red" stroke="white" stroke-width="1.5"><polygon points="5.5,3 5.5,21 10.5,16 16,21 18,19 12.5,14 19,14"/></svg>');
             background-size: contain;
             background-repeat: no-repeat;
             z-index: 99999;
             display: none;
             pointer-events: none;
-            transition: top 0.08s ease-out, left 0.08s ease-out; /* Płynny ruch */
         }
     </style>
 </head>
@@ -90,9 +105,14 @@
         <p>Kliknij tu żeby przejsc dalej</p>
     </div>
 
-    <!-- Ekran wirusa -->
+    <!-- Ekran wirusa w tle -->
     <div id="virus-screen">
         <img id="bg-image" src="fakewirus.png" alt="Fake Virus Screen" onerror="alert('Błąd: Brak pliku fakewirus.png w folderze!');">
+    </div>
+
+    <!-- Latające okienko HACKED -->
+    <div id="floating-box">
+        <img src="fakevirushacked.png" alt="Hacked Box" onerror="alert('Błąd: Brak pliku fakevirushacked.png w folderze!');">
     </div>
 
     <!-- Samoruchoma czerwona strzałka myszy -->
@@ -108,7 +128,13 @@
         const sound = document.getElementById('alarm-sound');
         const startScreen = document.getElementById('start-screen');
         const virusScreen = document.getElementById('virus-screen');
+        const floatingBox = document.getElementById('floating-box');
         const fakeCursor = document.getElementById('fake-cursor');
+
+        // Zmienne do fizyki latającego okienka
+        let posX = 100, posY = 100;
+        let speedX = 4;
+        let speedY = 4;
 
         function triggerPrank() {
             // 1. Uruchomienie dźwięku
@@ -116,15 +142,17 @@
                 console.log("Audio zablokowane:", err);
             });
 
-            // 2. Pokazanie ekranu wirusa i włączenie fałszywego kursora
+            // 2. Pokazanie ekranu wirusa, latającego okienka i kursora
             startScreen.style.display = 'none';
             virusScreen.style.display = 'block';
+            floatingBox.style.display = 'block';
             fakeCursor.style.display = 'block';
 
-            // 3. Uruchomienie szalejącego kursora
+            // 3. Uruchomienie animacji latającego okienka i kursora
+            requestAnimationFrame(animateDVD);
             startCrazyCursor();
 
-            // 4. Przejście w tryb pełnoekranowy
+            // 4. Pełny ekran
             if (document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen();
             } else if (document.documentElement.webkitRequestFullscreen) {
@@ -134,16 +162,44 @@
             }
         }
 
+        // Funkcja sprawiająca, że okienko "HACKED" odbija się od krawędzi
+        function animateDVD() {
+            posX += speedX;
+            posY += speedY;
+
+            const boxWidth = floatingBox.clientWidth;
+            const boxHeight = floatingBox.clientHeight;
+
+            // Odbicia od ścian
+            if (posX <= 0 || posX + boxWidth >= window.innerWidth) {
+                speedX = -speedX;
+            }
+            if (posY <= 0 || posY + boxHeight >= window.innerHeight) {
+                speedY = -speedY;
+            }
+
+            floatingBox.style.left = posX + 'px';
+            floatingBox.style.top = posY + 'px';
+
+            requestAnimationFrame(animateDVD);
+        }
+
+        // Funkcja szalejącego kursora myszy
         function startCrazyCursor() {
             setInterval(() => {
-                // Losowa pozycja na ekranie
                 const randomX = Math.random() * (window.innerWidth - 50);
                 const randomY = Math.random() * (window.innerHeight - 50);
-
                 fakeCursor.style.left = randomX + 'px';
                 fakeCursor.style.top = randomY + 'px';
-            }, 100); // Kursor zmienia pozycję co 0.1 sekundy, płynnie sunąc po ekranie
+            }, 80);
         }
+
+        // Blokada klawiszy
+        document.addEventListener('keydown', function(event) {
+            if (virusScreen.style.display === 'block') {
+                event.preventDefault();
+            }
+        });
     </script>
 </body>
 </html>
