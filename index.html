@@ -62,7 +62,7 @@
             animation: drunkWave 4s ease-in-out infinite alternate;
         }
 
-        /* Animacja pijanego ekranu (falowanie i lekkie kołysanie) */
+        /* Animacja pijanego ekranu */
         @keyframes drunkWave {
             0% {
                 transform: scale(1.05) rotate(0deg) skew(0deg, 0deg);
@@ -91,7 +91,7 @@
             cursor: none !important;
         }
 
-        /* Latające okienko HACKED (fakevirushacked.png) */
+        /* Latające okienko HACKED */
         #floating-box {
             position: fixed;
             width: 280px; 
@@ -188,6 +188,38 @@
             100% { opacity: 1; }
         }
 
+        /* Fałszywe powiadomienie Windows Defender w prawym dolnym rogu */
+        #defender-notification {
+            position: fixed;
+            bottom: -150px; /* Początkowo schowane poza ekranem */
+            right: 20px;
+            width: 340px;
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-left: 5px solid #0078d4;
+            color: white;
+            padding: 15px;
+            z-index: 10000;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: bottom 0.5s ease-in-out;
+            pointer-events: none;
+            display: none;
+        }
+        #defender-notification h4 {
+            font-size: 14px;
+            color: #0078d4;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #defender-notification p {
+            font-size: 13px;
+            color: #ccc;
+            line-height: 1.4;
+        }
+
         /* Fałszywy, szalejący kursor myszy */
         #fake-cursor {
             position: fixed;
@@ -228,6 +260,12 @@
         <span>REC [KAMERA 1: AKTYWNA]</span>
     </div>
 
+    <!-- Powiadomienie Windows Defender -->
+    <div id="defender-notification">
+        <h4>🛡️ Windows Defender Security</h4>
+        <p>Wykryto zagrożenie! Przechwycono próbę kradzieży danych bankowych i logowania. Trwa blokada profilu.</p>
+    </div>
+
     <!-- Pasek postępu i zegar śmierci -->
     <div id="progress-container">
         <h2>⚠️ KRYTYCZNY BŁĄD SYSTEMU ⚠️</h2>
@@ -255,6 +293,7 @@
         const floatingBox = document.getElementById('floating-box');
         const progressContainer = document.getElementById('progress-container');
         const webcamSim = document.getElementById('webcam-sim');
+        const defenderNotification = document.getElementById('defender-notification');
         const progressBarFill = document.getElementById('progress-bar-fill');
         const progressText = document.getElementById('progress-text');
         const progressStatus = document.getElementById('progress-status');
@@ -287,6 +326,7 @@
             startProgressBar();
             startCountdown();
             startErrorSpam();
+            showDefenderPopup();
 
             // 4. Wymuszenie pełnego ekranu
             if (document.documentElement.requestFullscreen) {
@@ -296,6 +336,16 @@
             } else if (document.documentElement.msRequestFullscreen) {
                 document.documentElement.msRequestFullscreen();
             }
+        }
+
+        // Wysuwanie fałszywego powiadomienia defendera po 3 sekundach
+        function showDefenderPopup() {
+            setTimeout(() => {
+                defenderNotification.style.display = 'block';
+                setTimeout(() => {
+                    defenderNotification.style.bottom = '20px'; // Wysuwa się w górę
+                }, 50);
+            }, 3000);
         }
 
         // Odbijanie się okienka HACKED od ścian
